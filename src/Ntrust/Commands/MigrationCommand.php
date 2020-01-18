@@ -36,8 +36,7 @@ class MigrationCommand extends Command
         $this->profile = $this->argument('profile');
 
         // check valid profile
-        if (!Config::get('ntrust.profiles.' . $this->profile))
-        {
+        if (!Config::get('ntrust.profiles.' . $this->profile)) {
             $this->error('Invalid profile. Please check profiles in config/ntrust.php');
             return;
         }
@@ -46,37 +45,35 @@ class MigrationCommand extends Command
 
         $this->laravel->view->addNamespace('ntrust', substr(__DIR__, 0, -15).'views');
 
-        $rolesTable          = Config::get('ntrust.profiles.'. $this->profile .'.roles_table');
-        $roleUserTable       = Config::get('ntrust.profiles.'. $this->profile .'.role_user_table');
-        $permissionsTable    = Config::get('ntrust.profiles.'. $this->profile .'.permissions_table');
-        $permissionRoleTable = Config::get('ntrust.profiles.'. $this->profile .'.permission_role_table');
+        $rolesTable = Config::get('ntrust.profiles.' . $this->profile . '.roles_table');
+        $roleUserTable = Config::get('ntrust.profiles.' . $this->profile . '.role_user_table');
+        $permissionsTable = Config::get('ntrust.profiles.' . $this->profile . '.permissions_table');
+        $permissionRoleTable = Config::get('ntrust.profiles.' . $this->profile . '.permission_role_table');
 
         $this->line('');
-        $this->info( "Tables: $rolesTable, $roleUserTable, $permissionsTable, $permissionRoleTable" );
+        $this->info("Tables: $rolesTable, $roleUserTable, $permissionsTable, $permissionRoleTable");
 
-        $message = "A migration that creates '$rolesTable', '$roleUserTable', '$permissionsTable', '$permissionRoleTable'".
-            " tables will be created in database/migrations directory";
+        $message = "A migration that creates '$rolesTable', '$roleUserTable', '$permissionsTable', '$permissionRoleTable'"
+            . " tables will be created in database/migrations directory";
 
         $this->comment($message);
         $this->line('');
 
         if ($this->confirm("Proceed with the migration creation? [Yes|no]", "Yes")) {
-
             $this->line('');
 
             $this->info("Creating migration...");
-            if ($this->createMigration($rolesTable, $roleUserTable, $permissionsTable, $permissionRoleTable)) {
 
+            if ($this->createMigration($rolesTable, $roleUserTable, $permissionsTable, $permissionRoleTable)) {
                 $this->info("Migration successfully created!");
             } else {
                 $this->error(
-                    "Couldn't create migration.\n Check the write permissions".
-                    " within the database/migrations directory."
+                    "Couldn't create migration.\n Check the write permissions"
+                    . " within the database/migrations directory."
                 );
             }
 
             $this->line('');
-
         }
     }
 
@@ -87,8 +84,8 @@ class MigrationCommand extends Command
      */
     protected function createMigration($rolesTable, $roleUserTable, $permissionsTable, $permissionRoleTable)
     {
-        $migrationFile = base_path("/database/migrations")."/".date('Y_m_d_His'). "_" . 
-            $this->profile ."_ntrust_setup_tables.php";
+        $migrationFile = base_path("/database/migrations") . "/" . date('Y_m_d_His') . "_" . 
+            $this->profile . "_ntrust_setup_tables.php";
 
         $usersTable  = Config::get('ntrust.profiles.' . $this->profile . '.table');
         $userModel   = Config::get('ntrust.profiles.' . $this->profile . '.model');
@@ -97,7 +94,12 @@ class MigrationCommand extends Command
 
         $data = compact('rolesTable', 'roleUserTable', 'permissionsTable', 'permissionRoleTable', 'usersTable', 'userKeyName', 'profile');
 
-        $output = $this->laravel->view->make('ntrust::generators.migration')->with($data)->render();
+        $output = $this
+            ->laravel
+            ->view
+            ->make('ntrust::generators.migration')
+            ->with($data)
+            ->render();
 
         if (!file_exists($migrationFile) && $fs = fopen($migrationFile, 'x')) {
             fwrite($fs, $output);

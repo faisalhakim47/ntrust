@@ -55,7 +55,7 @@ class NtrustServiceProvider extends ServiceProvider
         $this->app->bind('ntrust', function ($app) {
             return new Ntrust($app);
         });
-        
+
         $this->app->alias('ntrust', 'Klaravel\Ntrust');
     }
 

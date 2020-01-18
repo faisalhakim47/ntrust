@@ -18,8 +18,9 @@ trait NtrustRoleTrait
                     return $this->perms()->get();
                 });
         } 
-        else
+        else {
             return $this->perms()->get();
+        }
     }
 
     /**
@@ -48,7 +49,8 @@ trait NtrustRoleTrait
             Config::get('ntrust.profiles.' . self::$roleProfile . '.permission'),
             Config::get('ntrust.profiles.' . self::$roleProfile . '.permission_role_table'),
             Config::get('ntrust.profiles.' . self::$roleProfile . '.role_foreign_key'),
-            Config::get('ntrust.profiles.' . self::$roleProfile . '.permission_foreign_key'));
+            Config::get('ntrust.profiles.' . self::$roleProfile . '.permission_foreign_key')
+        );
     }
 
     /**
@@ -89,7 +91,7 @@ trait NtrustRoleTrait
 
                 if ($hasPermission && !$requireAll) {
                     return true;
-                } elseif (!$hasPermission && $requireAll) {
+                } else if (!$hasPermission && $requireAll) {
                     return false;
                 }
             }
@@ -156,11 +158,13 @@ trait NtrustRoleTrait
      */
     public function detachPermission($permission)
     {
-        if (is_object($permission))
+        if (is_object($permission)) {
             $permission = $permission->getKey();
+        }
 
-        if (is_array($permission))
+        if (is_array($permission)) {
             $permission = $permission['id'];
+        }
 
         $this->perms()->detach($permission);
 
@@ -202,7 +206,7 @@ trait NtrustRoleTrait
      */
     public static function clearCache($role = null) 
     {
-        if(Cache::getStore() instanceof TaggableStore) {
+        if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('ntrust.profiles.' . self::$roleProfile . '.permission_role_table'))
                 ->flush();
 
@@ -213,4 +217,3 @@ trait NtrustRoleTrait
         }
     }
 }
-

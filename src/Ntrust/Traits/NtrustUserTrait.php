@@ -7,7 +7,7 @@ use InvalidArgumentException;
 
 trait NtrustUserTrait
 {
-    //Big block of caching functionality.
+    // Big block of caching functionality.
     public function cachedRoles()
     {
         $userPrimaryKey = $this->primaryKey;
@@ -19,8 +19,9 @@ trait NtrustUserTrait
                     return $this->roles()->get();
                 });
         } 
-        else
+        else {
             return $this->roles()->get();
+        }
     }
 
     /**
@@ -44,19 +45,16 @@ trait NtrustUserTrait
      */
     protected static function bootNtrustUserTrait()
     {
-        static::saved(function()
-        {
+        static::saved(function() {
             self::clearCache();
         });
 
-        static::deleted(function($user)
-        {
+        static::deleted(function($user) {
             self::clearCache($user);
         });
 
-        if(method_exists(self::class, 'restored')) {
-            static::restored(function($user)
-            {
+        if (method_exists(self::class, 'restored')) {
+            static::restored(function($user) {
                 self::clearCache($user);
             });
         }
@@ -78,7 +76,8 @@ trait NtrustUserTrait
 
                 if ($hasRole && !$requireAll) {
                     return true;
-                } elseif (!$hasRole && $requireAll) {
+                }
+                else if (!$hasRole && $requireAll) {
                     return false;
                 }
             }
@@ -87,7 +86,8 @@ trait NtrustUserTrait
             // If we've made it this far and $requireAll is TRUE, then ALL of the roles were found.
             // Return the value of $requireAll;
             return $requireAll;
-        } else {
+        }
+        else {
             foreach ($this->cachedRoles() as $role) {
                 if ($role->name == $name) {
                     return true;
@@ -114,7 +114,8 @@ trait NtrustUserTrait
 
                 if ($hasPerm && !$requireAll) {
                     return true;
-                } elseif (!$hasPerm && $requireAll) {
+                }
+                else if (!$hasPerm && $requireAll) {
                     return false;
                 }
             }
@@ -123,7 +124,8 @@ trait NtrustUserTrait
             // If we've made it this far and $requireAll is TRUE, then ALL of the perms were found.
             // Return the value of $requireAll;
             return $requireAll;
-        } else {
+        }
+        else {
             foreach ($this->cachedRoles() as $role) {
                 // Validate against the Permission table
                 foreach ($role->cachedPermissions() as $perm) {
@@ -161,14 +163,17 @@ trait NtrustUserTrait
         // Set up default values and validate options.
         if (!isset($options['validate_all'])) {
             $options['validate_all'] = false;
-        } else {
+        }
+        else {
             if ($options['validate_all'] !== true && $options['validate_all'] !== false) {
                 throw new InvalidArgumentException();
             }
         }
+        
         if (!isset($options['return_type'])) {
             $options['return_type'] = 'boolean';
-        } else {
+        }
+        else {
             if ($options['return_type'] != 'boolean' &&
                 $options['return_type'] != 'array' &&
                 $options['return_type'] != 'both') {
@@ -182,6 +187,7 @@ trait NtrustUserTrait
         foreach ($roles as $role) {
             $checkedRoles[$role] = $this->hasRole($role);
         }
+
         foreach ($permissions as $permission) {
             $checkedPermissions[$permission] = $this->can($permission);
         }
@@ -192,16 +198,19 @@ trait NtrustUserTrait
         if(($options['validate_all'] && !(in_array(false,$checkedRoles) || in_array(false,$checkedPermissions))) ||
             (!$options['validate_all'] && (in_array(true,$checkedRoles) || in_array(true,$checkedPermissions)))) {
             $validateAll = true;
-        } else {
+        }
+        else {
             $validateAll = false;
         }
 
         // Return based on option
         if ($options['return_type'] == 'boolean') {
             return $validateAll;
-        } elseif ($options['return_type'] == 'array') {
+        }
+        else if ($options['return_type'] == 'array') {
             return ['roles' => $checkedRoles, 'permissions' => $checkedPermissions];
-        } else {
+        }
+        else {
             return [$validateAll, ['roles' => $checkedRoles, 'permissions' => $checkedPermissions]];
         }
 
@@ -214,11 +223,11 @@ trait NtrustUserTrait
      */
     public function attachRole($role)
     {
-        if(is_object($role)) {
+        if (is_object($role)) {
             $role = $role->getKey();
         }
 
-        if(is_array($role)) {
+        if (is_array($role)) {
             $role = $role['id'];
         }
 
@@ -266,7 +275,9 @@ trait NtrustUserTrait
      */
     public function detachRoles($roles=null)
     {
-        if (!$roles) $roles = $this->roles()->get();
+        if (!$roles) {
+            $roles = $this->roles()->get();
+        }
         
         foreach ($roles as $role) {
             $this->detachRole($role);
@@ -278,13 +289,13 @@ trait NtrustUserTrait
      */
     public static function clearCache($user = null) 
     {
-        if(Cache::getStore() instanceof TaggableStore) {
+        if (Cache::getStore() instanceof TaggableStore) {
             Cache::tags(Config::get('ntrust.profiles.' . self::$roleProfile . '.role_user_table'))
                 ->flush();
 
-            if ($user)
+            if ($user) {
                 $user->roles()->sync([]);
+            }
         }
     }
-
 }

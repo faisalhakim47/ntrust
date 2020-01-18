@@ -156,15 +156,16 @@ class Ntrust
      */
     public function routeNeedsRoleOrPermission($route, $roles, $permissions, $result = null, $requireAll = false)
     {
-        $filterName  =      is_array($roles)       ? implode('_', $roles)       : $roles;
-        $filterName .= '_'.(is_array($permissions) ? implode('_', $permissions) : $permissions);
-        $filterName .= '_'.substr(md5($route), 0, 6);
+        $filterName = is_array($roles) ? implode('_', $roles) : $roles;
+        $filterName .= '_' . (is_array($permissions) ? implode('_', $permissions) : $permissions);
+        $filterName .= '_' . substr(md5($route), 0, 6);
         $closure = function () use ($roles, $permissions, $result, $requireAll) {
             $hasRole  = $this->hasRole($roles, $requireAll);
             $hasPerms = $this->can($permissions, $requireAll);
             if ($requireAll) {
                 $hasRolePerm = $hasRole && $hasPerms;
-            } else {
+            }
+            else {
                 $hasRolePerm = $hasRole || $hasPerms;
             }
             if (!$hasRolePerm) {
@@ -178,4 +179,3 @@ class Ntrust
         $this->app->router->when($route, $filterName);
     }
 }
-
